@@ -1,0 +1,47 @@
+{
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "eslint",
+        "releaseRules": [
+          {
+            "tag": "BREAKING",
+            "release": "major"
+          },
+          {
+            "tag": "FEAT",
+            "release": "minor"
+          },
+          {
+            "tag": "FIX",
+            "release": "patch"
+          },
+          {
+            "tag": "DOCS",
+            "release": "patch"
+          },
+          {
+            "tag": "TEST",
+            "release": "patch"
+          },
+          {
+            "tag": "REFACTOR",
+            "release": "patch"
+          },
+          {
+            "tag": "CHORE",
+            "release": "patch"
+          }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "eslint"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+} 
