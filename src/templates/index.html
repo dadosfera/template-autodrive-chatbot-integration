@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AutoDrive Chatbot — Mock Host Page</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --warn-bg: #fef3c7;
+        --warn-border: #f59e0b;
+        --warn-text: #78350f;
+        --ok-bg: #ecfdf5;
+        --ok-border: #10b981;
+        --ok-text: #065f46;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1120;
+          --card: #111827;
+          --border: #1f2937;
+          --text: #e5e7eb;
+          --muted: #94a3b8;
+          --warn-bg: #422006;
+          --warn-text: #fde68a;
+          --ok-bg: #052e23;
+          --ok-text: #a7f3d0;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 2.5rem 1.25rem 6rem;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      main { max-width: 820px; margin: 0 auto; }
+      h1 { font-size: 1.75rem; margin: 0 0 0.25rem; letter-spacing: -0.02em; }
+      .sub { color: var(--muted); margin: 0 0 2rem; }
+      section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+      h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.06em;
+           color: var(--muted); margin: 0 0 1rem; }
+      dl { display: grid; grid-template-columns: minmax(140px, auto) 1fr;
+           gap: 0.5rem 1rem; margin: 0; }
+      dt { color: var(--muted); font-size: 0.875rem; }
+      dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+           font-size: 0.875rem; overflow-wrap: anywhere; }
+      .banner { border-radius: 10px; padding: 0.875rem 1.125rem; margin-bottom: 1.25rem;
+                font-size: 0.9375rem; border: 1px solid; }
+      .banner.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+      .banner.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-text); }
+      .banner code { font-weight: 600; }
+      ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+      #widget-log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                    font-size: 0.8125rem; color: var(--muted); margin: 0;
+                    max-height: 220px; overflow-y: auto; }
+      #widget-log li { margin-bottom: 0.25rem; overflow-wrap: anywhere; }
+      button {
+        font: inherit; font-size: 0.875rem; cursor: pointer;
+        background: var(--accent); color: #fff; border: 0;
+        border-radius: 8px; padding: 0.5rem 1rem;
+      }
+      button.secondary { background: transparent; color: var(--accent);
+                         border: 1px solid var(--border); }
+
+      /* Widget CSS fix: the bundle's base `:host { height: 100% }` is never
+         overridden by the floating rules (`position: fixed; bottom: 24px`),
+         so the host spans the whole viewport and overflows 24px past the top —
+         the launcher renders half-cut at the TOP-right instead of bottom-right.
+         Document-level rules on the shadow host win over `:host` defaults, so
+         the embedding page can correct it: size the host to its content. */
+      autodrive-chat[data-position="bottom-right"],
+      autodrive-chat[data-position="bottom-left"] {
+        height: auto;
+        min-height: 0;
+        max-height: calc(100vh - 48px);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AutoDrive Chatbot — Mock Host Page</h1>
+      <p class="sub">
+        A stand-in for a customer site. It embeds the widget and serves the
+        <code>tokenEndpoint</code> from its own backend.
+      </p>
+
+      {% if missing_required %}
+      <div class="banner warn">
+        <strong>Setup incomplete.</strong> These environment variables are still unset,
+        so the widget will not answer questions:
+        <ul>
+          {% for name in missing_required %}<li><code>{{ name }}</code></li>{% endfor %}
+        </ul>
+      </div>
+      {% else %}
+      <div class="banner ok">
+        <strong>Configuration complete.</strong> All required variables are set.
+      </div>
+      {% endif %}
+
+      {% if mock_token %}
+      <div class="banner warn">
+        <strong>Mock token mode is on</strong> (<code>AUTODRIVE_MOCK_TOKEN=true</code>).
+        <code>{{ token_endpoint }}</code> returns a synthetic token without calling the
+        Assistant API — the widget mounts, but real answers require real credentials.
+      </div>
+      {% endif %}
+
+      <section>
+        <h2>Widget configuration in use</h2>
+        <dl>
+          <dt>client</dt><dd>{{ widget_config.client }}</dd>
+          <dt>apiProfile</dt><dd>{{ widget_config.apiProfile }}</dd>
+          <dt>datasetId</dt><dd>{{ widget_config.datasetId or "— unset —" }}</dd>
+          {% if widget_config.assistantId is defined %}
+          <dt>assistantId</dt><dd>{{ widget_config.assistantId or "— unset —" }}</dd>
+          {% endif %}
+          <dt>environment</dt><dd>{{ widget_config.environment }}</dd>
+          <dt>autodriveUrl</dt><dd>{{ widget_config.autodriveUrl }}</dd>
+          <dt>tokenEndpoint</dt><dd>{{ widget_config.tokenEndpoint }}</dd>
+          <dt>locale</dt><dd>{{ widget_config.locale }}</dd>
+          <dt>externalUserId</dt><dd>{{ widget_config.externalUserId }}</dd>
+          <dt>script</dt><dd>{{ widget_script_url }}</dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Session controls</h2>
+        <p class="sub" style="margin-bottom: 1rem">
+          A real site calls <code>resetConversation()</code> on logout so the next
+          user does not inherit the previous conversation.
+        </p>
+        <button id="btn-logout" class="secondary" type="button">
+          Simulate logout (reset conversation)
+        </button>
+      </section>
+
+      <section>
+        <h2>Widget events</h2>
+        <ul id="widget-log">
+          <li>Waiting for the widget to load…</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Mount point the widget renders into. Must exist before init runs. -->
+    <div id="autodrive-chat"></div>
+
+    <script src="{{ widget_script_url }}" async></script>
+    <script>
+      (function () {
+        var logEl = document.getElementById("widget-log");
+        var first = true;
+        function log(message) {
+          if (first) { logEl.innerHTML = ""; first = false; }
+          var li = document.createElement("li");
+          li.textContent = "[" + new Date().toLocaleTimeString() + "] " + message;
+          logEl.appendChild(li);
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Config is rendered server-side so the client secret never reaches the page.
+        var config = {{ widget_config | tojson }};
+
+        config.uiContextProvider = function () {
+          return { screen: window.location.pathname };
+        };
+        config.userContextProvider = function () {
+          return { user_id: config.externalUserId };
+        };
+        config.onReady = function (instance) {
+          log("onReady — widget mounted");
+          document.getElementById("btn-logout").addEventListener("click", function () {
+            instance.resetConversation();
+            log("resetConversation() called");
+          });
+        };
+        config.onMessage = function (message) {
+          log("onMessage — " + ((message && message.role) || "message"));
+        };
+        config.onExecutionRequest = function (request) {
+          log("onExecutionRequest — " + JSON.stringify(request));
+        };
+        config.onError = function (error) {
+          log("onError — " + ((error && error.message) || String(error)));
+        };
+
+        window.addEventListener("load", function () {
+          if (!window.AutoDriveChat) {
+            log("AutoDriveChat not found — check the script URL and the browser console.");
+            return;
+          }
+          try {
+            window.AutoDriveChat.init(config);
+          } catch (error) {
+            log("init failed — " + error.message);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

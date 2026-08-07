@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    container_name: autodrive-chatbot-mock
+    ports:
+      - "${PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      # Values below are defaults applied when absent from .env.
+      AUTODRIVE_MOCK_TOKEN: "${AUTODRIVE_MOCK_TOKEN:-false}"
+    volumes:
+      # Live-reload the page and handlers during development.
+      - ./src:/app/src:ro
+    command:
+      ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    restart: unless-stopped
+
+  tests:
+    build: .
+    container_name: autodrive-chatbot-mock-tests
+    profiles: ["test"]
+    environment:
+      AUTODRIVE_MOCK_TOKEN: "false"
+    command: ["pytest", "-q"]
