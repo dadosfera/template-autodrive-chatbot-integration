@@ -11,7 +11,6 @@ Serves two things:
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -224,22 +223,6 @@ async def autodrive_dev_proxy(
     if settings.autodrive_dev_proxy_origin:
         headers["Origin"] = settings.autodrive_dev_proxy_origin
     body = await request.body()
-    # Compatibility shim (widget <-> API version mismatch): the published
-    # widget sends orchestration.response_mode="auto" on ai-question, but the
-    # deployed Assistant API only accepts generative|structured|hybrid and
-    # 422s. Map "auto" -> "generative" until the widget/API are realigned.
-    if request.method == "POST" and path.endswith("ai-question") and body:
-        try:
-            payload = json.loads(body)
-            if payload.get("orchestration", {}).get("response_mode") == "auto":
-                payload["orchestration"]["response_mode"] = "generative"
-                body = json.dumps(payload).encode()
-                logger.warning(
-                    "Dev proxy shim: rewrote orchestration.response_mode auto->generative"
-                )
-        except (json.JSONDecodeError, AttributeError):
-            pass
-
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             upstream = await client.request(

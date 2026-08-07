@@ -12,6 +12,8 @@ BASE_ENV = {
     "autodrive_assistant_id": "assistant-456",
     "autodrive_api_profile": "assistant",
     "autodrive_mock_token": False,
+    # Explicit so a developer's shell/.env (via docker compose) can't leak in.
+    "autodrive_dev_proxy": False,
 }
 
 
