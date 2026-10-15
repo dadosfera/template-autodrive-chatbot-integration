@@ -4,7 +4,7 @@
 > - **This repo:** reference host for embedding the Autodrive chatbot widget (mock page + token backend).
 > - **Role in the group:** integration template for customer sites.
 > - **Status:** template.
-> - **Group map:** [dadosfera/autodrive-ddf-group](https://github.com/dadosfera/autodrive-ddf-group)
+> - **Group map:** [dadosfera/autodrive-ddf-group](https://github.com/dadosfera/autodrive-ddf-group) (private; Dadosfera internal access)
 
 A runnable reference integration of the **AutoDrive Chatbot widget**, following
 the [official installation guide](https://autodrive-verticity.stg.dadosfera.ai/help/how-to/chatbot).
